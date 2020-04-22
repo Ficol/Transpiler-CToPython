@@ -16,10 +16,17 @@ class Token:
         return f'pos={self.pos}, type={self.type}, value={self.value}'
 
 
+class LexerError(Exception):
+    """ Contains position in buffer and line of unrecognized token
+    """
+
+    def __init__(self, line, pos):
+        self.line = line
+        self.pos = pos
+
+
 class Lexer:
     def __init__(self):
-        """[summary]
-        """
         tokens = [
             (r'def', 'DEF'),
             (r'if', 'IF'),
@@ -115,15 +122,6 @@ class Lexer:
         while token is not None:
             yield token
             token = self.token()
-
-
-class LexerError(Exception):
-    """ Contains position in buffer and line of unrecognized token
-    """
-
-    def __init__(self, line, pos):
-        self.line = line
-        self.pos = pos
 
 
 if __name__ == '__main__':
