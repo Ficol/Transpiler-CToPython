@@ -7,22 +7,26 @@ class Token:
         type and value of token if needed
     """
 
-    def __init__(self, pos, type, value=None):
-        self.pos = pos
+    def __init__(self, line, type, value=None):
+        self.line = line
         self.type = type
         self.value = value
 
     def __str__(self):
-        return f'pos={self.pos}, type={self.type}, value={self.value}'
+        return f'line={self.line}, type={self.type}, value={self.value}'
+
+    def __eq__(self, other):
+        if other is None:
+            return False
+        return (self.line, self.type, self.value) == (other.line, other.type, other.value)
 
 
 class LexerError(Exception):
     """ Contains position in buffer and line of unrecognized token
     """
 
-    def __init__(self, line, pos):
+    def __init__(self, line):
         self.line = line
-        self.pos = pos
 
 
 class Lexer:
@@ -92,11 +96,11 @@ class Lexer:
             prev_indend = self.indend
             self.indend = newline.end() - newline.start() - 1
             if self.indend < prev_indend:
-                return Token(self.pos, 'DEDEND')
+                return Token(self.line, 'DEDENT')
             elif self.indend > prev_indend:
-                return Token(self.pos, 'INDEND')
+                return Token(self.line, 'INDENT')
             else:
-                return Token(self.pos, 'NEWLINE')
+                return Token(self.line, 'NEWLINE')
         whitespace = self.whitespace.match(self.buffer, self.pos)
         if whitespace:
             self.pos = whitespace.end()
@@ -107,16 +111,18 @@ class Lexer:
             if matched:
                 self.pos = matched.end()
                 if type == 'VALUE_INT':
-                    return Token(self.pos, type, int(matched.group(0)))
+                    return Token(self.line, type, int(matched.group(0)))
                 if type == 'VALUE_FLOAT':
-                    return Token(self.pos, type, float(matched.group(0)))
+                    return Token(self.line, type, float(matched.group(0)))
                 if type == 'VALUE_BOOL':
-                    return Token(self.pos, type, matched.group(0) == 'True')
-                return Token(self.pos, type)
-        raise LexerError(self.line, self.pos)
+                    return Token(self.line, type, matched.group(0) == 'True')
+                if type == 'IDENTIFIER':
+                    return Token(self.line, type, matched.group(0))
+                return Token(self.line, type)
+        raise LexerError(self.line)
 
     def tokens(self):
-        """ Returs iterator to tokens in the input buffer
+        """ Returns iterator to tokens in the input buffer
         """
         token = self.token()
         while token is not None:
@@ -133,4 +139,4 @@ if __name__ == '__main__':
         for token in lexer.tokens():
             print(token)
     except LexerError as le:
-        print(f'lexical error: line {le.line}, position {le.pos}')
+        print(f'lexical error: line {le.line}')
