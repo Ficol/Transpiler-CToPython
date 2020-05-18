@@ -13,7 +13,9 @@ class Token:
         self.value = value
 
     def __str__(self):
-        return f'line={self.line}, type={self.type}, value={self.value}'
+        if self.value is None:
+            return f'{self.type}'
+        return f'{self.type}({self.value})'
 
     def __eq__(self, other):
         if other is None:
@@ -43,6 +45,9 @@ class Lexer:
             (r'bool', 'BOOL'),
             (r'return', 'RETURN'),
             (r'print', 'PRINT'),
+            (r'-?\d+\.\d+', 'VALUE_FLOAT'),
+            (r'-?\d+', 'VALUE_INT'),
+            (r'True|False', 'VALUE_BOOL'),
             (r':', 'COLON'),
             (r',', 'COMMA'),
             (r'->', 'RETURN_TYPE'),
@@ -63,9 +68,6 @@ class Lexer:
             (r'and', 'AND'),
             (r'or', 'OR'),
             (r'not', 'NOT'),
-            (r'\d+\.\d+', 'VALUE_FLOAT'),
-            (r'\d+', 'VALUE_INT'),
-            (r'True|False', 'VALUE_BOOL'),
             (r'[a-zA-Z_][a-zA-Z0-9_]*', 'IDENTIFIER')
         ]
         self.buffer = None

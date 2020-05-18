@@ -18,9 +18,9 @@ class LexerTesting(unittest.TestCase):
         self.assertEqual(self.lexer.token(), Token(1, 'ELIF'))
 
     def test_value(self):
-        self.lexer.input('4 4.5 True')
+        self.lexer.input('4 -4.5 True')
         self.assertEqual(self.lexer.token(), Token(1, 'VALUE_INT', 4))
-        self.assertEqual(self.lexer.token(), Token(1, 'VALUE_FLOAT', 4.5))
+        self.assertEqual(self.lexer.token(), Token(1, 'VALUE_FLOAT', -4.5))
         self.assertEqual(self.lexer.token(), Token(1, 'VALUE_BOOL', True))
 
     def test_operator(self):
@@ -46,6 +46,12 @@ class LexerTesting(unittest.TestCase):
         self.assertEqual(self.lexer.token(), Token(2, 'NEWLINE'))
         self.assertEqual(self.lexer.token(), Token(3, 'INDENT'))
         self.assertEqual(self.lexer.token(), Token(4, 'DEDENT'))
+
+    def test_undefined(self):
+        self.lexer.input('x &')
+        self.lexer.token()
+        with self.assertRaises(LexerError):
+            self.lexer.token()
 
 
 if __name__ == '__main__':

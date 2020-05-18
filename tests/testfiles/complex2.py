@@ -1,4 +1,4 @@
-x = 5
+x : int = 5
 while x > 0:
 	if x % 3 == 0:
 		print(0)

@@ -1,4 +1,6 @@
-x = 2
+def a() -> None:
+	x : int = 2
+x : int = 2
 if x == 1:
-	y = 3.4
-z = False
+	y : float = 3.4
+z : bool = False
