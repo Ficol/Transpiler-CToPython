@@ -66,10 +66,10 @@ class Parser:
                     raise ParserError(token2)
                 if scope not in variables:
                     variables[scope] = []
-                if token.value not in variables[scope]:
-                    variables[scope].append((token.value, token2.type))
-                else:
-                    raise ParserError(token)
+                for variable in variables[scope]:
+                    if token.value == variable[0] and token2.type != variable[1]:
+                        raise ParserError(token)
+                variables[scope].append((token.value, token2.type))
                 token2 = next(tokens)
                 if token2.type != 'EQUALS':
                     return token2
@@ -78,7 +78,8 @@ class Parser:
                 Node(token, parent=assign_ast)
                 return self.expression_statement(tokens, assign_ast, variables, scope)
             if token2.type == 'LP':
-                func_call_ast = Node(token, parent=ast)
+                func_call_ast = Node(Token(token.line, 'RETURN_TYPE'), parent=ast)
+                Node(token, parent=func_call_ast)
                 return self.func_call_statement(tokens, func_call_ast, variables, scope)
             raise ParserError(token)
         if token.type == 'DEF':
@@ -219,7 +220,8 @@ class Parser:
             return token
         token2 = next(tokens)
         if token.type == 'IDENTIFIER' and token2.type == 'LP':
-            func_call_ast = Node(token, parent=ast)
+            func_call_ast = Node(Token(token.line, 'RETURN_TYPE'), parent=ast)
+            Node(token, parent=func_call_ast)
             return self.func_call_statement(tokens, func_call_ast, variables, scope)
         operation_ast = Node(Token(token.line, type='COLON'), parent=ast)
         Node(token, parent=operation_ast)
@@ -227,9 +229,9 @@ class Parser:
             raise ParserError(token2)
         elif token.type == 'NOT' and (token2.type == 'IDENTIFIER' or self.value(token2.type)):
             token = next(tokens)
+            Node(token2, parent=operation_ast)
             if not self.binary_op(token.type) and not self.binary_logic_op(token.type) and not self.comparison_op(token.type):
                 return token
-            Node(token2, parent=operation_ast)
             Node(token, parent=operation_ast)
         elif (token.type == 'IDENTIFIER' or self.value(token.type)) and not self.binary_op(token2.type) and not self.binary_logic_op(token2.type) and not self.comparison_op(token2.type):
             return token2

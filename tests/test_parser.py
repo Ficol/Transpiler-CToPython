@@ -69,11 +69,8 @@ class ParserTesting(unittest.TestCase):
         tokens = iter([Token(1, 'IDENTIFIER', 'x'), Token(1, 'LP'), Token(1, 'IDENTIFIER', 'y'), Token(
             1, 'COMMA'), Token(1, 'VALUE_INT', 2), Token(1, 'RP'), Token(1, 'NEWLINE')])
         variables, ast = self.parser.parse(tokens)
-        for pre, _, node in RenderTree(ast):
-            print("%s%s" % (pre, node.name))
-        print([str(node.name) for node in PreOrderIter(ast)])
         self.assertEqual([str(node.name) for node in PreOrderIter(ast)], [
-                         'Program', 'IDENTIFIER(x)', 'IDENTIFIER(y)', 'VALUE_INT(2)'])
+                         'Program', 'RETURN_TYPE', 'IDENTIFIER(x)', 'IDENTIFIER(y)', 'VALUE_INT(2)'])
         self.assertEqual(variables, {})
 
     def test_statement_error(self):

@@ -7,5 +7,5 @@ while x > 0 and 1 == 1:
 	x = x - 1
 	print(x)
 y : int = 3 + 2 * 2
-print(sum(x, y))
+print(sum(x, y), 2)
 
